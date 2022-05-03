@@ -1,4 +1,4 @@
-"""Trains a vgg13 model on the FER+ dataset"""
+"""Trains a efficientnet-b0 model on the FER+ dataset"""
 
 import torch
 import torch.nn as nn
@@ -24,11 +24,6 @@ from sklearn.metrics import confusion_matrix
 LEARNING_RATE = 0.001
 NUM_EPOCHS = 35
 device = "cuda:0"  #cpu
-
-# for _dir in [DATA_ROOT, MODEL_PATH]:
-#     if not os.path.exists(_dir):
-#         os.makedirs(_dir)
-
 
 def _process_row(row):
     """
@@ -282,27 +277,8 @@ def main(args):
     }
 
 
-    # PRE TRAINED
-    # model = vgg13(pretrained=True)
+    # PRETRAINED
     model = EfficientNet.from_pretrained('efficientnet-b0', num_classes=8)
-    # model = EfficientNet.from_name('efficientnet-b0', num_classes=8)
-    # model = models.efficientnet_b0()
-    # print(model)
-    # assert 0==1
-
-    # num_ftrs = model.classifier[3].out_features
-
-    # model.classifier = nn.Sequential(nn.Linear(7 * 7 * 512, 1024),
-    #                                 nn.ReLU(),
-    #                                 nn.Dropout(0.25),
-    #                                 nn.Linear(1024, 1024),
-    #                                 nn.ReLU(),
-    #                                 nn.Dropout(0.25),
-    #                                 nn.Linear(1024, 8))
-
-    # for param in model.features.parameters():
-    #     param.requires_grad = False
-
     model = model.to(device)
 
     # Loss weights created from an analysis of the distribution
@@ -336,30 +312,23 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", 
                         "--base_folder", 
-                        default="C:\\Users\\EUNJULEE\\Documents\\IIPL\\2022\\project\\facial_expression_recognition\\FERPlus\\data",
                         type = str, 
                         help = "Base folder containing the training, validation and testing data.", 
-                        required = False)
+                        required = True)
     parser.add_argument("-m", 
                         "--model_folder", 
-                        default="C:\\Users\\EUNJULEE\\Documents\\IIPL\\2022\\project\\facial_expression_recognition\\FERPlus\\data\\models",
                         type = str, 
                         help = "models save folder.", 
-                        required = False)
-    # parser.add_argument("-m", 
-    #                     "--training_mode", 
-    #                     type = str,
-    #                     default='majority',
-    #                     help = "Specify the training mode: majority, probability, crossentropy or multi_target.")
+                        required = True)
+    parser.add_argument("-m", 
+                        "--training_mode", 
+                        type = str,
+                        default='majority',
+                        help = "Specify the training mode: majority, probability, crossentropy or multi_target.")
     parser.add_argument('-f')
 
     args = parser.parse_args()
-
-    # Paths for data, model, an experiment name etc
-    # DATA_ROOT = "/home/rex/data/FERPlus/images/"
-    # MODEL_DIR = "/home/rex/models/FERPlus/"
     exp_name = "test1"
-    # MODEL_PATH = MODEL_DIR + exp_name
     args.model_folder = os.path.join(args.model_folder, exp_name)
 
     for _dir in [args.model_folder]:
